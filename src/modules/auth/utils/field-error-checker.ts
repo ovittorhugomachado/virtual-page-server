@@ -1,4 +1,4 @@
-import type { UserData } from '../../types/user-data.js';
+import type { UserData } from '../../../types/user-data.js';
 
 export const signUpFieldsErrorChecker = (body: UserData): string | null => {
     
