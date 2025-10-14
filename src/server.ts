@@ -1,5 +1,5 @@
 import express from 'express';
-import registerRoutes from './modules/register/register.routes';
+import registerRoutes from './modules/auth/auth.routes';
 
 const app = express()
 const port = 3000

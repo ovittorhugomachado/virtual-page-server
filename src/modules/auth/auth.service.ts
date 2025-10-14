@@ -3,9 +3,10 @@ import type { UserData } from "../../types/user-data";
 import { ConflictError, ValidationError } from "../../utils/errors";
 import bcrypt from 'bcryptjs';
 import { stripNonDigits } from "../../utils/stripFormating";
+import { tokenGenerator } from './token-generator';
+import { emailConfirmationService } from '../../utils/email-sender';
 
-
-export const RegisterService = async (data: UserData) => {
+export const registerService = async (data: UserData) => {
 
     const { name, email, phoneNumber, password } = data;
 
@@ -22,14 +23,33 @@ export const RegisterService = async (data: UserData) => {
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
+    const { activeEmailToken } = tokenGenerator({ email });
+
     const user = await prisma.user.create({
         data: {
             name,
             email,
             phoneNumber: rawPhoneNumber,
             password: hashedPassword,
+            status: 'PENDING',
+            token: activeEmailToken,
         },
     });
 
+    await emailConfirmationService(user.email, user.token, user.name);
+
     return user;
+};
+
+export const confirmEmailService = async (token: string) => {
+
+    const user = await prisma.user.findUnique({ where: { token } });
+
+    if (!user) throw new ValidationError('Token inválido');
+    if (user.status === 'ACTIVE') throw new ConflictError('Email já confirmado');
+    
+    return await prisma.user.update({
+        where: { id: user.id },
+        data: { status: 'ACTIVE' },
+    })
 }
