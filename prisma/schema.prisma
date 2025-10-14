@@ -9,13 +9,15 @@ datasource db {
 }
 
 model User {
-  id          Int       @id @default(autoincrement())
+  id          Int        @id @default(autoincrement())
   name        String
-  email       String    @unique
+  email       String     @unique
   phoneNumber String
   password    String
-  created_at  DateTime  @default(now())
-  updated_at  DateTime  @updatedAt
+  status      UserStatus
+  token       String
+  created_at  DateTime   @default(now())
+  updated_at  DateTime   @updatedAt
   projects    Project[]
 
   @@map("users")
@@ -27,7 +29,7 @@ model Project {
   user            User             @relation(fields: [userId], references: [id], onDelete: Cascade)
   name            String
   type            PageType
-  status          Status
+  status          ProjectStatus
   projectSettings ProjectSettings? @relation("ProjectToSettings")
   created_at      DateTime         @default(now())
 
@@ -48,9 +50,15 @@ enum PageType {
   CUSTOM_WEBSITE
 }
 
-enum Status {
+enum ProjectStatus {
   ACTIVE
   FREE_TRIAL
   EXPIRED
+  CANCELED
+}
+
+enum UserStatus {
+  PENDING
+  ACTIVE
   CANCELED
 }
