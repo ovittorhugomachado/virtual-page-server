@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { confirmEmail, login, logout, refreshAccessToken, register } from './auth.controller';
+import { confirmEmail, deleteUser, login, logout, refreshAccessToken, register } from './auth.controller';
 import { authLimiter } from './utils/auth-limiter';
 import { authenticateToken } from '../../middleware/authenticate-token.middleware';
 
@@ -19,5 +19,7 @@ router.post('/login', authLimiter, login);
 router.post('/refresh-token', refreshAccessToken);
 
 router.post('/logout', authenticateToken, logout);
+
+router.delete('/delete-user', authenticateToken, deleteUser);
 
 export default router;

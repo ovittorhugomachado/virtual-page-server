@@ -1,6 +1,6 @@
 import type { Request, Response } from "express";
 import { loginFieldsErrorChecker, signUpFieldsErrorChecker } from "./utils/field-error-checker";
-import { confirmEmailService, loginService, logoutService, refreshTokenService, registerService } from "./auth.service";
+import { confirmEmailService, deleteUserService, loginService, logoutService, refreshTokenService, registerService } from "./auth.service";
 import { handleControllerError } from "../../utils/errors";
 
 export const register = async (req: Request, res: Response): Promise<void> => {
@@ -83,7 +83,7 @@ export const login = async (req: Request, res: Response): Promise<void> => {
 export const refreshAccessToken = async (req: Request, res: Response): Promise<void> => {
 
     const refreshToken = req.cookies.refreshToken;
-    
+
     if (!refreshToken) {
         res.status(401).json({ message: 'Refresh token não fornecido' });
         return
@@ -139,3 +139,21 @@ export const logout = async (req: Request & { user?: any }, res: Response): Prom
 
     }
 }
+
+export const deleteUser = async (req: Request, res: Response): Promise<void> => {
+
+    const userId = Number(req.user?.userId);
+
+    try {
+
+        await deleteUserService(userId);
+
+        res.status(200).json({ message: 'Usuário deletado com sucesso' });
+        return
+
+    } catch (error: any) {
+
+        handleControllerError(res, error);
+
+    }
+};

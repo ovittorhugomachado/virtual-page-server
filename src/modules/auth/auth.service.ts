@@ -1,7 +1,7 @@
 import { prisma } from '../../lib/prisma';
 import jwt from 'jsonwebtoken'
 import type { UserData } from "../../types/user-data";
-import { ConflictError, UnauthorizedError, ValidationError } from "../../utils/errors";
+import { ConflictError, NotFoundError, UnauthorizedError, ValidationError } from "../../utils/errors";
 import bcrypt from 'bcryptjs';
 import { stripNonDigits } from "../../utils/stripFormating";
 import { confirmEmailTokenGenerator, generateTokensPassword } from './utils/token-generator';
@@ -51,7 +51,7 @@ export const confirmEmailService = async (tokenEmail: string) => {
 
     if (!user) throw new ValidationError('Token inválido');
     if (user.status === 'ACTIVE') throw new ConflictError('Email já confirmado');
-    
+
     return await prisma.user.update({
         where: { id: user.id },
         data: { status: 'ACTIVE' },
@@ -108,11 +108,26 @@ export const refreshTokenService = async (refreshToken: string) => {
     );
 
     return newAccessToken;
-};
+}
 
 export const logoutService = async (userId: number) => {
     await prisma.user.update({
         where: { id: userId },
         data: { refreshAccessToken: null },
     });
-};
+}
+
+export const deleteUserService = async (userId: number) => {
+
+    const user = await prisma.user.findUnique({
+        where: { id: userId },
+    });
+
+    if (!user || !userId || isNaN(userId)) {
+        throw new NotFoundError('Usuário não encontrado');
+    };
+
+    await prisma.user.delete({
+        where: { id: userId },
+    })
+}
