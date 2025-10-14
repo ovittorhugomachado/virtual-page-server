@@ -1,0 +1,56 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id          Int       @id @default(autoincrement())
+  name        String
+  email       String    @unique
+  phoneNumber String
+  password    String
+  created_at  DateTime  @default(now())
+  updated_at  DateTime  @updatedAt
+  projects    Project[]
+
+  @@map("users")
+}
+
+model Project {
+  id              Int              @id @default(autoincrement())
+  userId          Int
+  user            User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name            String
+  type            PageType
+  status          Status
+  projectSettings ProjectSettings? @relation("ProjectToSettings")
+  created_at      DateTime         @default(now())
+
+  @@map("projects")
+}
+
+model ProjectSettings {
+  id         Int      @id @default(autoincrement())
+  projectId  Int      @unique
+  project    Project  @relation("ProjectToSettings", fields: [projectId], references: [id])
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+}
+
+enum PageType {
+  LANDING_PAGE
+  CORPORATE_WEBSITE
+  CUSTOM_WEBSITE
+}
+
+enum Status {
+  ACTIVE
+  FREE_TRIAL
+  EXPIRED
+  CANCELED
+}
