@@ -1,6 +1,6 @@
 import type { Request, Response } from "express";
 import { loginFieldsErrorChecker, signUpFieldsErrorChecker } from "./utils/field-error-checker";
-import { confirmEmailService, loginService, logoutService, registerService } from "./auth.service";
+import { confirmEmailService, loginService, logoutService, refreshTokenService, registerService } from "./auth.service";
 import { handleControllerError } from "../../utils/errors";
 
 export const register = async (req: Request, res: Response): Promise<void> => {
@@ -80,6 +80,42 @@ export const login = async (req: Request, res: Response): Promise<void> => {
     }
 }
 
+export const refreshAccessToken = async (req: Request, res: Response): Promise<void> => {
+
+    const refreshToken = req.cookies.refreshToken;
+    
+    if (!refreshToken) {
+        res.status(401).json({ message: 'Refresh token não fornecido' });
+        return
+    }
+
+    try {
+        const newAccessToken = await refreshTokenService(refreshToken);
+
+        res.cookie('token', newAccessToken, {
+            httpOnly: true,
+            secure: false,
+            sameSite: 'lax',
+            maxAge: 15 * 60 * 1000, // 15 minutos
+        });
+
+        res.cookie('refreshToken', refreshToken, {
+            httpOnly: true,
+            secure: false,
+            sameSite: 'lax',
+            maxAge: 30 * 24 * 60 * 60 * 1000, // 30 dias
+        });
+
+        res.status(200).json({ message: 'Token renovado com sucesso' });
+        return
+
+    } catch (error: any) {
+
+        handleControllerError(res, error);
+
+    }
+}
+
 export const logout = async (req: Request & { user?: any }, res: Response): Promise<void> => {
 
     try {
@@ -102,4 +138,4 @@ export const logout = async (req: Request & { user?: any }, res: Response): Prom
         handleControllerError(res, error);
 
     }
-};
+}

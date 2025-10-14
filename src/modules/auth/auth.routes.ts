@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { confirmEmail, login, logout, register } from './auth.controller';
+import { confirmEmail, login, logout, refreshAccessToken, register } from './auth.controller';
 import { authLimiter } from './utils/auth-limiter';
 import { authenticateToken } from '../../middleware/authenticate-token.middleware';
 
@@ -15,6 +15,8 @@ router.post('/register', register)
 router.patch('/confirm-email/:token', confirmEmail)
 
 router.post('/login', authLimiter, login);
+
+router.post('/refresh-token', refreshAccessToken);
 
 router.post('/logout', authenticateToken, logout);
 

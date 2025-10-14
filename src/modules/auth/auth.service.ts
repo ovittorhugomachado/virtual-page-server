@@ -1,10 +1,14 @@
 import { prisma } from '../../lib/prisma';
+import jwt from 'jsonwebtoken'
 import type { UserData } from "../../types/user-data";
 import { ConflictError, UnauthorizedError, ValidationError } from "../../utils/errors";
 import bcrypt from 'bcryptjs';
 import { stripNonDigits } from "../../utils/stripFormating";
 import { confirmEmailTokenGenerator, generateTokensPassword } from './utils/token-generator';
 import { emailConfirmationService } from '../../utils/email-sender';
+
+const JWT_SECRET = process.env.JWT_SECRET || 'viberver#o5%nwwepfiwep';
+const REFRESH_SECRET = process.env.REFRESH_SECRET || 'vewvwe#2t-432cwecwe';
 
 export const registerService = async (data: UserData) => {
 
@@ -82,6 +86,29 @@ export const loginService = async (data: UserData) => {
     return { accessToken, refreshAccessToken };
 
 }
+
+export const refreshTokenService = async (refreshToken: string) => {
+
+    const payload = jwt.verify(refreshToken, REFRESH_SECRET) as any;
+
+    const user = await prisma.user.findUnique({
+        where: { id: payload.userId },
+    });
+
+    if (!user || user.refreshAccessToken !== refreshToken) {
+        throw new UnauthorizedError('Registro não encontrado através do token fornecido');
+    };
+
+    const newAccessToken = jwt.sign(
+        {
+            userId: user.id,
+        },
+        JWT_SECRET,
+        { expiresIn: '1d' }
+    );
+
+    return newAccessToken;
+};
 
 export const logoutService = async (userId: number) => {
     await prisma.user.update({
