@@ -19,7 +19,7 @@ export const emailConfirmationService = async (email: string, token: string, use
     await transporter.sendMail({
         from: `"Virtual Page" <${process.env.EMAIL_USER}>`,
         to: email,
-        subject: 'Confirme seu e-mail - Virtual Page',
+        subject: 'Confirme seu e-mail',
         html: `
       <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #222; max-width: 600px; margin: 0 auto; padding: 20px;">
         <h2 style="color: #000000 !important;">Bem-vindo à Virtual Page, ${userName}!</h2>
@@ -35,6 +35,41 @@ export const emailConfirmationService = async (email: string, token: string, use
         </p>
 
         <p style="color: #000000 !important;">Se você não criou uma conta na <strong>Virtual Page</strong>, ignore este e-mail.</p>
+
+        <hr style="margin: 30px 0; border: none; border-top: 1px solid #ddd;">
+
+        <p style="font-size: 13px; color: #000000 !important;">Caso o botão acima não funcione, copie e cole o link abaixo no seu navegador:</p>
+        
+        <a href="${confirmLink}" style="color: #4A3AFF;">${confirmLink}</a>
+
+        <p style="margin-top: 40px;">Atenciosamente,<br><strong>Equipe Virtual Page</strong></p>
+      </div>
+    `
+    });
+};
+
+export const emailChangeConfirmationService = async (email: string, token: string, userName: string) => {
+    const confirmLink = `${process.env.FRONTEND_URL}/confirm-email/${token}`;
+
+    await transporter.sendMail({
+        from: `"Virtual Page" <${process.env.EMAIL_USER}>`,
+        to: email,
+        subject: 'Confirme seu novo e-mail',
+        html: `
+      <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #222; max-width: 600px; margin: 0 auto; padding: 20px;">
+        <h2 style="color: #000000 !important;">Confirme seu novo e-mail, ${userName}!</h2>
+
+        <p style="color: #000000 !important;">Você solicitou a alteração do seu endereço de e-mail na <strong>Virtual Page</strong>.</p>
+        <p style="color: #000000 !important;">Para garantir a segurança da sua conta, precisamos confirmar que este novo endereço realmente pertence a você.</p>
+
+        <p style="margin: 30px 0; color: #000000 !important;">
+          <a href="${confirmLink}" 
+             style="background-color: #CAFC00; color: #000000 !important; padding: 12px 24px; text-decoration: none; border-radius: 8px; font-weight: bold;">
+            Confirmar novo e-mail
+          </a>
+        </p>
+
+        <p style="color: #000000 !important;">Se você não solicitou essa alteração, ignore este e-mail. Sua conta continuará associada ao endereço anterior.</p>
 
         <hr style="margin: 30px 0; border: none; border-top: 1px solid #ddd;">
 
