@@ -1,7 +1,14 @@
 import { Router } from 'express';
-import { confirmEmail, deleteUser, login, logout, refreshAccessToken, register } from './auth.controller';
 import { authLimiter } from './utils/auth-limiter';
 import { authenticateToken } from '../../middleware/authenticate-token.middleware';
+import {
+    confirmEmail,
+    deleteUser,
+    login,
+    logout,
+    refreshAccessToken,
+    register
+} from './auth.controller';
 
 const router = Router()
 

@@ -9,17 +9,18 @@ datasource db {
 }
 
 model User {
-  id                 Int        @id @default(autoincrement())
-  name               String
-  email              String     @unique
-  phoneNumber        String
-  password           String
-  status             UserStatus
-  refreshAccessToken String?
-  tokenEmail         String     @unique
-  created_at         DateTime   @default(now())
-  updated_at         DateTime   @updatedAt
-  projects           Project[]
+  id                  Int                  @id @default(autoincrement())
+  name                String
+  email               String               @unique
+  phoneNumber         String
+  password            String
+  status              UserStatus
+  refreshAccessToken  String?
+  passwordResetTokens PasswordResetToken[]
+  tokenEmail          String               @unique
+  created_at          DateTime             @default(now())
+  updated_at          DateTime             @updatedAt
+  projects            Project[]
 
   @@map("users")
 }
@@ -43,6 +44,17 @@ model ProjectSettings {
   project    Project  @relation("ProjectToSettings", fields: [projectId], references: [id])
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt
+}
+
+model PasswordResetToken {
+  id        Int      @id @default(autoincrement())
+  token     String   @unique
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id])
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  @@map("password_reset_tokens")
 }
 
 enum PageType {

@@ -1,7 +1,14 @@
 import type { Request, Response } from "express";
-import { loginFieldsErrorChecker, signUpFieldsErrorChecker } from "./utils/field-error-checker";
-import { confirmEmailService, deleteUserService, loginService, logoutService, refreshTokenService, registerService } from "./auth.service";
 import { handleControllerError } from "../../utils/errors";
+import { loginFieldsErrorChecker, signUpFieldsErrorChecker } from "./utils/field-error-checker";
+import {
+    confirmEmailService,
+    deleteUserService,
+    loginService,
+    logoutService,
+    refreshTokenService,
+    registerService
+} from "./auth.service";
 
 export const register = async (req: Request, res: Response): Promise<void> => {
 

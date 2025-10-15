@@ -1,11 +1,11 @@
 import { prisma } from '../../lib/prisma';
+import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken'
 import type { UserData } from "../../types/user-data";
-import { ConflictError, NotFoundError, UnauthorizedError, ValidationError } from "../../utils/errors";
-import bcrypt from 'bcryptjs';
 import { stripNonDigits } from "../../utils/stripFormating";
-import { confirmEmailTokenGenerator, generateTokensPassword } from './utils/token-generator';
 import { emailConfirmationService } from '../../utils/email-sender';
+import { confirmEmailTokenGenerator, generateTokensPassword } from './utils/token-generator';
+import { ConflictError, NotFoundError, UnauthorizedError, ValidationError } from "../../utils/errors";
 
 const JWT_SECRET = process.env.JWT_SECRET || 'viberver#o5%nwwepfiwep';
 const REFRESH_SECRET = process.env.REFRESH_SECRET || 'vewvwe#2t-432cwecwe';
