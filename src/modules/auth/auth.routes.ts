@@ -7,13 +7,16 @@ import {
     login,
     logout,
     refreshAccessToken,
-    register
+    register,
+    validateEmailAvailability
 } from './auth.controller';
 
 const router = Router()
 
 //CRIAR UM REGISTRO NA TABELA USER E ENVIAR EMAIL DE CONFIRMAÇÃO
 router.post('/register', register)
+
+router.get('/validate-email/:email', validateEmailAvailability)
 
 //ATUALIZA O VALOR DA COLUNA STATUS USER
 //1°- PEGA O VALOR DO TOKEN NA URL

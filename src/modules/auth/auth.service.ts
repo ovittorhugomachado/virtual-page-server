@@ -45,6 +45,15 @@ export const registerService = async (data: UserData) => {
     return user;
 }
 
+export const validateEmailAvailabilityService = async (email: string) => {
+    const user = await prisma.user.findUnique({ where: { email } });
+    if (user) {
+        throw new ConflictError('Email já cadastrado');
+    }
+
+    return true;
+}
+
 export const confirmEmailService = async (tokenEmail: string) => {
 
     const user = await prisma.user.findUnique({ where: { tokenEmail } });

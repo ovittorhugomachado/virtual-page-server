@@ -7,7 +7,8 @@ import {
     loginService,
     logoutService,
     refreshTokenService,
-    registerService
+    registerService,
+    validateEmailAvailabilityService
 } from "./auth.service";
 
 export const register = async (req: Request, res: Response): Promise<void> => {
@@ -32,6 +33,28 @@ export const register = async (req: Request, res: Response): Promise<void> => {
     }
 }
 
+export const validateEmailAvailability = async (req: Request, res: Response): Promise<void> => {
+
+    try {
+        const { email } = req.params;
+        if (!email) {
+            res.status(400).json({ message: 'O campo "email" é obrigatório' });
+            return;
+        }
+        
+        await validateEmailAvailabilityService(email);
+
+        res.status(200).json({ message: 'Email disponível' });
+        return
+
+    } catch (error: any) {
+
+        handleControllerError(res, error);
+
+    }
+
+}
+
 export const confirmEmail = async (req: Request, res: Response): Promise<void> => {
 
     try {
@@ -39,7 +62,7 @@ export const confirmEmail = async (req: Request, res: Response): Promise<void> =
 
         await confirmEmailService(String(token));
 
-        res.status(201).json({ message: 'Email confirmado com sucesso' });
+        res.status(201).json({ message: 'Email disponível' });
         return
 
     } catch (error: any) {
