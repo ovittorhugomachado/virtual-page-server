@@ -9,7 +9,7 @@ const app = express()
 const port = 3000
 
 app.use(cors({
-    origin: 'http://localhost:5173', // Permite apenas o frontend em localhost:5173
+    origin: 'http://localhost:5174', // Permite apenas o frontend em localhost:5173
     credentials: true, // Permite envio de cookies e headers de autenticação
 }));
 app.use(cookieParser());

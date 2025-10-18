@@ -1,6 +1,25 @@
 import type { Request, Response } from 'express';
-import { updateEmailService, updateNameService } from './user.service';
+import { getUserDataService, updateEmailService, updateNameService } from './user.service';
 import { handleControllerError } from '../../utils/errors';
+
+export const getUser = async (req: Request, res: Response): Promise<void> => {
+    const userId = req.user?.userId;
+
+    // Se o token não for fornecido ou inválido, retorna null
+    if (!userId) {
+        res.status(200).json(null); // Retorna null em vez de lançar erro
+        return;
+    }
+
+    try {
+        const user = await getUserDataService(userId);
+
+        res.status(200).json(user);
+        return;
+    } catch (error: any) {
+        handleControllerError(res, error);
+    }
+};
 
 export const updateEmail = async (req: Request, res: Response): Promise<void> => {
     const { email } = req.body;

@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "dev": "npx tsx watch src/server.ts",
-    "studio": "npx prisma studio"
+    "prisma": "npx prisma studio"
   },
   "keywords": [],
   "author": "",

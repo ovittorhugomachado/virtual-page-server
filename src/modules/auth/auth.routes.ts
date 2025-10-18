@@ -6,7 +6,7 @@ import {
     deleteUser,
     login,
     logout,
-    refreshAccessToken,
+    refreshAccessTokenVirtualPage,
     register,
     validateEmailAvailability
 } from './auth.controller';
@@ -16,6 +16,7 @@ const router = Router()
 //CRIAR UM REGISTRO NA TABELA USER E ENVIAR EMAIL DE CONFIRMAÇÃO
 router.post('/register', register)
 
+//VALIDAR O EMAIL QUANDO CRIA A CONTA OU ALTERA O EMAIL
 router.get('/validate-email/:email', validateEmailAvailability)
 
 //ATUALIZA O VALOR DA COLUNA STATUS USER
@@ -26,7 +27,7 @@ router.patch('/confirm-email/:token', confirmEmail)
 
 router.post('/login', authLimiter, login);
 
-router.post('/refresh-token', refreshAccessToken);
+router.post('/refresh-token', refreshAccessTokenVirtualPage);
 
 router.post('/logout', authenticateToken, logout);
 

@@ -85,30 +85,30 @@ export const loginService = async (data: UserData) => {
         userId: user.id,
     };
 
-    const { accessToken, refreshAccessToken } = generateTokensPassword(payload);
+    const { accessTokenVirtualPage, refreshAccessTokenVirtualPage } = generateTokensPassword(payload);
 
     await prisma.user.update({
         where: { id: user.id },
-        data: { refreshAccessToken },
+        data: { refreshAccessTokenVirtualPage },
     });
 
-    return { accessToken, refreshAccessToken };
+    return { accessTokenVirtualPage, refreshAccessTokenVirtualPage };
 
 }
 
-export const refreshTokenService = async (refreshToken: string) => {
+export const refreshTokenService = async (refreshTokenVirtualPage: string) => {
 
-    const payload = jwt.verify(refreshToken, REFRESH_SECRET) as any;
+    const payload = jwt.verify(refreshTokenVirtualPage, REFRESH_SECRET) as any;
 
     const user = await prisma.user.findUnique({
         where: { id: payload.userId },
     });
 
-    if (!user || user.refreshAccessToken !== refreshToken) {
+    if (!user || user.refreshAccessTokenVirtualPage !== refreshTokenVirtualPage) {
         throw new UnauthorizedError('Registro não encontrado através do token fornecido');
     };
 
-    const newAccessToken = jwt.sign(
+    const newaccessTokenVirtualPage = jwt.sign(
         {
             userId: user.id,
         },
@@ -116,13 +116,13 @@ export const refreshTokenService = async (refreshToken: string) => {
         { expiresIn: '1d' }
     );
 
-    return newAccessToken;
+    return newaccessTokenVirtualPage;
 }
 
 export const logoutService = async (userId: number) => {
     await prisma.user.update({
         where: { id: userId },
-        data: { refreshAccessToken: null },
+        data: { refreshAccessTokenVirtualPage: null },
     });
 }
 

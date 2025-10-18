@@ -12,9 +12,9 @@ export function confirmEmailTokenGenerator(payload: object) {
 
 export function generateTokensPassword(payload: object) {
 
-    const accessToken = jwt.sign(payload, JWT_SECRET, { expiresIn: '1d' });
+    const accessTokenVirtualPage = jwt.sign(payload, JWT_SECRET, { expiresIn: '1d' });
 
-    const refreshAccessToken = jwt.sign(payload, REFRESH_SECRET, { expiresIn: '30d' });
+    const refreshAccessTokenVirtualPage = jwt.sign(payload, REFRESH_SECRET, { expiresIn: '30d' });
 
-    return { accessToken, refreshAccessToken };
+    return { accessTokenVirtualPage, refreshAccessTokenVirtualPage };
 };

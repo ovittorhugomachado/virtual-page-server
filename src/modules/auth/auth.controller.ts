@@ -82,9 +82,9 @@ export const login = async (req: Request, res: Response): Promise<void> => {
             return
         }
 
-        const { accessToken, refreshAccessToken } = await loginService(req.body);
+        const { accessTokenVirtualPage, refreshAccessTokenVirtualPage } = await loginService(req.body);
 
-        res.cookie('token', accessToken, {
+        res.cookie('tokenVirtualPage', accessTokenVirtualPage, {
             httpOnly: true,
             secure: true,
             sameSite: 'none',
@@ -92,7 +92,7 @@ export const login = async (req: Request, res: Response): Promise<void> => {
             maxAge: 24 * 60 * 60 * 1000, //1 DIA
         });
 
-        res.cookie('refreshToken', refreshAccessToken, {
+        res.cookie('refreshTokenVirtualPage', refreshAccessTokenVirtualPage, {
             httpOnly: true,
             secure: true,
             sameSite: 'none',
@@ -110,26 +110,26 @@ export const login = async (req: Request, res: Response): Promise<void> => {
     }
 }
 
-export const refreshAccessToken = async (req: Request, res: Response): Promise<void> => {
+export const refreshAccessTokenVirtualPage = async (req: Request, res: Response): Promise<void> => {
 
-    const refreshToken = req.cookies.refreshToken;
+    const refreshTokenVirtualPage = req.cookies.refreshTokenVirtualPage;
 
-    if (!refreshToken) {
+    if (!refreshTokenVirtualPage) {
         res.status(401).json({ message: 'Refresh token não fornecido' });
         return
     }
 
     try {
-        const newAccessToken = await refreshTokenService(refreshToken);
+        const newaccessTokenVirtualPage = await refreshTokenService(refreshTokenVirtualPage);
 
-        res.cookie('token', newAccessToken, {
+        res.cookie('tokenVirtualPage', newaccessTokenVirtualPage, {
             httpOnly: true,
             secure: false,
             sameSite: 'lax',
             maxAge: 15 * 60 * 1000, // 15 minutos
         });
 
-        res.cookie('refreshToken', refreshToken, {
+        res.cookie('refreshTokenVirtualPage', refreshTokenVirtualPage, {
             httpOnly: true,
             secure: false,
             sameSite: 'lax',
@@ -158,8 +158,8 @@ export const logout = async (req: Request & { user?: any }, res: Response): Prom
 
         await logoutService(userId);
 
-        res.clearCookie('token');
-        res.clearCookie('refreshToken');
+        res.clearCookie('tokenVirtualPage');
+        res.clearCookie('refreshTokenVirtualPage');
         res.status(200).json({ message: 'Logout efetuado com sucesso' });
         return
 

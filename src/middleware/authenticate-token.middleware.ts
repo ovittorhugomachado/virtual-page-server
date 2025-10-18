@@ -12,22 +12,21 @@ interface UserPayload {
 declare global {
     namespace Express {
         interface Request {
-            user?: UserPayload;
+            user?: UserPayload | undefined;
         }
     }
 }
 
 export function authenticateToken(req: Request, res: Response, next: NextFunction): void {
-
-    const token = req.cookies.token
+    const token = req.cookies.tokenVirtualPage;
 
     if (!token) {
-        res.status(401).json({ message: 'Token não fornecido' });
+        req.user = undefined;
+        next();
         return;
     }
 
     try {
-
         const decoded = jwt.verify(token, JWT_SECRET) as UserPayload;
 
         if (typeof decoded.userId !== 'number') {
@@ -36,20 +35,18 @@ export function authenticateToken(req: Request, res: Response, next: NextFunctio
 
         req.user = decoded;
         next();
-
     } catch (error) {
-
         console.error('Erro no middleware JWT:', error);
 
         if (error instanceof jwt.TokenExpiredError) {
             res.status(401).json({ message: 'Token expirado' });
-            return
+            return;
         }
         if (error instanceof jwt.JsonWebTokenError) {
             res.status(403).json({ message: 'Token inválido' });
-            return
+            return;
         }
         res.status(500).json({ message: 'Erro interno durante a autenticação' });
-        return
+        return;
     }
 }
