@@ -16,34 +16,61 @@ model User {
   password                      String
   status                        UserStatus
   refreshAccessTokenVirtualPage String?
-  passwordResetTokens           PasswordResetToken[]
   tokenEmail                    String               @unique
   created_at                    DateTime             @default(now())
   updated_at                    DateTime             @updatedAt
   projects                      Project[]
+  passwordResetTokens           PasswordResetToken[]
 
   @@map("users")
 }
 
 model Project {
-  id              Int              @id @default(autoincrement())
-  userId          Int
-  user            User             @relation(fields: [userId], references: [id], onDelete: Cascade)
-  name            String
-  type            PageType
-  status          ProjectStatus
-  projectSettings ProjectSettings? @relation("ProjectToSettings")
-  created_at      DateTime         @default(now())
+  id          Int                @id @default(autoincrement())
+  userId      Int
+  user        User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name        String
+  type        PageType
+  status      ProjectStatus
+  alert       String //MENSAGEM URGENTE QUE FICA NO TOPO DO PAINEL
+  preferences Json
+  created_at  DateTime           @default(now())
+  updated_at  DateTime           @updatedAt
+  analytics   ProjectAnalytics[]
 
   @@map("projects")
 }
 
-model ProjectSettings {
-  id         Int      @id @default(autoincrement())
-  projectId  Int      @unique
-  project    Project  @relation("ProjectToSettings", fields: [projectId], references: [id])
-  created_at DateTime @default(now())
-  updated_at DateTime @updatedAt
+model ProjectAnalytics {
+  id             Int      @id @default(autoincrement())
+  projectId      Int
+  project        Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  accessDate     DateTime // DATA E HORARIO DE ACESSO (NODE)
+  totalAccesses  Int //ACESSOS TOTAIS (NODE)
+  uniqueVisitors Int // VISITANTES UNICOS (NODE)
+  salesOrSignups Int // VENDAS, CADASTRO OU INSCRIÇÕES (NODE)
+  avgTimeOnPage  Float? // TEMPO MÉDIO DE NAVEGAÇÃO (NODE E FRONT)
+  deviceStats    Json? // DISPOSITIVO: DESKTOP OU MOBILE (NODE)
+  genderStats    Json? // GÊNEROS (GA4)
+  ageStats       Json? // FAIXA ETÁRIA (GA4)
+  interestStats  Json? // INTERESSES (GA4)
+  leads          Lead[]
+
+  @@map("project_analytics")
+}
+
+model Lead {
+  id                 Int              @id @default(autoincrement())
+  projectAnalyticsId Int
+  projectAnalytics   ProjectAnalytics @relation(fields: [projectAnalyticsId], references: [id], onDelete: Cascade)
+  name               String? // NOME 
+  email              String? // EMAIL
+  phone              String? // TELEFONE
+  converted          Boolean          @default(false) //CONVERTEU OU NÃO         
+  createdAt          DateTime         @default(now())
+  updatedAt          DateTime         @updatedAt
+
+  @@map("leads")
 }
 
 model PasswordResetToken {
