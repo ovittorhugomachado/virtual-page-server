@@ -21,21 +21,22 @@ model User {
   updated_at                    DateTime             @updatedAt
   projects                      Project[]
   passwordResetTokens           PasswordResetToken[]
+  notifications                 Notification[] // Relacionamento com notificações
 
   @@map("users")
 }
 
 model Project {
-  id          Int                @id @default(autoincrement())
+  id          Int           @id @default(autoincrement())
   userId      Int
-  user        User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user        User          @relation(fields: [userId], references: [id], onDelete: Cascade)
   name        String
   type        PageType
   status      ProjectStatus
   alert       String //MENSAGEM URGENTE QUE FICA NO TOPO DO PAINEL
   preferences Json
-  created_at  DateTime           @default(now())
-  updated_at  DateTime           @updatedAt
+  created_at  DateTime      @default(now())
+  updated_at  DateTime      @updatedAt
 
   @@map("projects")
 }
@@ -49,6 +50,18 @@ model PasswordResetToken {
   createdAt DateTime @default(now())
 
   @@map("password_reset_tokens")
+}
+
+model Notification {
+  id     Int      @id @default(autoincrement())
+  userId Int
+  user   User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tag    String
+  title  String
+  text   String
+  date   DateTime @default(now())
+
+  @@map("notifications")
 }
 
 enum PageType {
