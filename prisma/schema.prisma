@@ -36,56 +36,8 @@ model Project {
   preferences Json
   created_at  DateTime           @default(now())
   updated_at  DateTime           @updatedAt
-  analytics   ProjectAnalytics[]
 
   @@map("projects")
-}
-
-model ProjectAnalytics {
-  id             Int      @id @default(autoincrement())
-  projectId      Int
-  project        Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
-  totalAccesses  Int //ACESSOS TOTAIS (NODE)
-  uniqueVisitors Int // VISITANTES UNICOS (NODE) PEGAR O A ARRAY VISTIOR QUE VEM DA TABELA ACCESS E VER QUANTOS NUMERO DIFERENTES EXISTE = ACESSO UNICO 
-  salesOrSignups Int // VENDAS, CADASTRO OU INSCRIÇÕES (NODE)
-  avgTimeOnPage  Float? // TEMPO MÉDIO DE NAVEGAÇÃO (NODE E FRONT)
-  deviceStats    Json? // DISPOSITIVO: DESKTOP OU MOBILE (NODE)
-  genderStats    Json? // GÊNEROS (GA4)
-  ageStats       Json? // FAIXA ETÁRIA (GA4)
-  interestStats  Json? // INTERESSES (GA4)
-  leads          Lead[]
-  access         Access[]
-
-  @@map("project_analytics")
-}
-
-model Access {
-  id                 Int               @id @default(autoincrement())
-  visitorId          Int
-  ProjectAnalytics   ProjectAnalytics? @relation(fields: [projectAnalyticsId], references: [id], onDelete: Cascade)
-  projectAnalyticsId Int?
-  accessTime         AccessTime[]
-}
-
-model AccessTime {
-  id         Int      @id @default(autoincrement())
-  visitorId   Int?
-  accessDate DateTime // DATA E HORARIO DE ACESSO (NODE)
-  visitor     Access?  @relation(fields: [visitorId], references: [id], onDelete: Cascade)
-}
-
-model Lead {
-  id                 Int              @id @default(autoincrement())
-  projectAnalyticsId Int
-  projectAnalytics   ProjectAnalytics @relation(fields: [projectAnalyticsId], references: [id], onDelete: Cascade)
-  name               String? // NOME 
-  email              String? // EMAIL
-  phone              String? // TELEFONE
-  converted          Boolean          @default(false) //CONVERTEU OU NÃO         
-  createdAt          DateTime         @default(now())
-  updatedAt          DateTime         @updatedAt
-
-  @@map("leads")
 }
 
 model PasswordResetToken {
