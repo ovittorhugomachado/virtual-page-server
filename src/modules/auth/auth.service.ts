@@ -6,6 +6,7 @@ import { stripNonDigits } from "../../utils/stripFormating";
 import { emailConfirmationServiceSender } from '../../utils/email-sender';
 import { confirmEmailTokenGenerator, generateTokensPassword } from './utils/token-generator';
 import { ConflictError, NotFoundError, UnauthorizedError, ValidationError } from "../../utils/errors";
+import { sendNotificationService } from '../notifications/notifications.service';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'viberver#o5%nwwepfiwep';
 const REFRESH_SECRET = process.env.REFRESH_SECRET || 'vewvwe#2t-432cwecwe';
@@ -38,6 +39,13 @@ export const registerService = async (data: UserData) => {
             status: 'PENDING',
             tokenEmail: activeEmailToken,
         },
+    });
+
+    await sendNotificationService({
+        userId: user.id,
+        tag: "AWARD",
+        title: "Bem-vindo à Virtual Page!",
+        text: "Obrigado por se registrar! Estamos felizes em tê-lo conosco.",
     });
 
     await emailConfirmationServiceSender(user.email, user.tokenEmail, user.name);
