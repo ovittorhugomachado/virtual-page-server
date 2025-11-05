@@ -1,20 +1,35 @@
 import { prisma } from "../../lib/prisma";
-import { NotFoundError } from "../../utils/errors";
+import { NotFoundError, ValidationError } from "../../utils/errors";
 
-export const sendWelcomeNotification = (userId: number): void => {
+export const sendNotificationService = async (data: {
+    userId: number;
+    tag: 'PROMOTION' | 'AWARD' | 'UPDATE' | 'ATTENTION'
+    title: string;
+    text: string;
+}) => {
+    const { userId, tag, title, text } = data;
 
-    const user = userId;
+    const user = await prisma.user.findUnique({
+        where: { id: userId },
+    });
+
     if (!user) {
-        throw new NotFoundError('Usuário não encontrado');
+        throw new NotFoundError("Usuário não encontrado");
     }
 
-    const notification = prisma.notification.create({
+    const validTags = ["PROMOTION", "AWARD", "UPDATE", "ATTENTION"];
+    if (!validTags.includes(tag)) {
+        throw new ValidationError(`O tipo de notificação '${tag}' não é válido.`);
+    }
+
+    const notification = await prisma.notification.create({
         data: {
-            userId: user,
-            tag: 'AWARD',
-            title: 'Bem vindo à Virtual Page',
-            text: 'Esse é o início de uma grande jornada!.... ',
-            read: false,
-        }
-    })
-}
+            userId,
+            tag,
+            title,
+            text,
+        },
+    });
+
+    return notification;
+};

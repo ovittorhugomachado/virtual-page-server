@@ -1,21 +1,32 @@
-export const register = async (req: Request, res: Response): Promise<void> => {
+import type { Request, Response } from "express";
+import { sendNotificationService } from "./notifications.service";
+import { handleControllerError } from "../../utils/errors";
 
+export const sendNotification = async (req: Request, res: Response): Promise<void> => {
     try {
+        const { userId, tag, title, text } = req.body;
 
-        const validationError = signUpFieldsErrorChecker(req.body);
-        if (validationError) {
-            res.status(422).json({ error: validationError });
-            return
+        if (!userId || !tag || !title || !text) {
+            res.status(400).json({ error: "Os campos userId, tag, title e text são obrigatórios." });
+            return;
         }
 
-        await registerService(req.body);
+        const parsedUserId = Number(userId);
+        if (isNaN(parsedUserId)) {
+            res.status(400).json({ error: "O campo userId deve ser um número válido." });
+            return;
+        }
 
-        res.status(201).json({ message: 'Usuário criado com sucesso' });
-        return
+        const notification = await sendNotificationService({
+            userId: parsedUserId,
+            tag,
+            title,
+            text,
+        });
 
+        res.status(201).json({ message: "Notificação enviada com sucesso", notification });
+        return;
     } catch (error: any) {
-
         handleControllerError(res, error);
-
     }
-}
+};
