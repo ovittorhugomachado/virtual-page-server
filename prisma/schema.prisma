@@ -56,7 +56,7 @@ model Notification {
   id     Int      @id @default(autoincrement())
   userId Int
   user   User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  tag    String
+  tag    NotificationType
   title  String
   text   String
   date   DateTime @default(now())
@@ -81,4 +81,11 @@ enum UserStatus {
   PENDING
   ACTIVE
   CANCELED
+}
+
+enum NotificationType {
+  PROMOTION
+  AWARD
+  UPDATE
+  ATTENTION
 }
