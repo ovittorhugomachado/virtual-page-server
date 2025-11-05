@@ -1,5 +1,5 @@
 import { prisma } from '../../lib/prisma';
-import { emailChangeConfirmationService } from '../../utils/email-sender';
+import { emailChangeConfirmationSender } from '../../utils/email-sender';
 import { ConflictError, NotFoundError } from '../../utils/errors';
 import { confirmEmailTokenGenerator } from '../auth/utils/token-generator';
 
@@ -11,6 +11,17 @@ export const getUserDataService = async (userId: number) => {
             name: true,
             email: true,
             status: true,
+            projects: {
+                select: {
+                    name: true,
+                    type: true,
+                    status: true,
+                    alert: true,
+                    preferences: true,
+                    created_at: true,
+                    updated_at: true,
+                }
+            }
         }
     });
 
@@ -20,6 +31,7 @@ export const getUserDataService = async (userId: number) => {
 
     return user;
 }
+
 export const updateEmailService = async (userId: number, email: string) => {
     const existingUser = await prisma.user.findUnique({ where: { email } });
 
@@ -38,7 +50,7 @@ export const updateEmailService = async (userId: number, email: string) => {
         },
     });
 
-    await emailChangeConfirmationService(user.email, user.tokenEmail, user.name);
+    await emailChangeConfirmationSender(user.email, user.tokenEmail, user.name);
 
     if (!user) {
         throw new NotFoundError('Usuário não encontrado');

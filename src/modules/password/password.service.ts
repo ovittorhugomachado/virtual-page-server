@@ -3,7 +3,7 @@ import { prisma } from '../../lib/prisma';
 import { randomUUID } from 'crypto';
 //import { transporter } from '../../utils/email';
 import { NotFoundError, ValidationError } from '../../utils/errors';
-import { emailresetPasswordService } from '../../utils/email-sender';
+import { emailResetPasswordSender } from '../../utils/email-sender';
 
 export const generateResetTokenService = async (email: string) => {
     const user = await prisma.user.findUnique({ where: { email } });
@@ -23,7 +23,7 @@ export const generateResetTokenService = async (email: string) => {
         }
     });
 
-    emailresetPasswordService(user.email, token, user.name) 
+    emailResetPasswordSender(user.email, token, user.name) 
 
     return { token, userId: user.id };
 };
@@ -46,7 +46,6 @@ export const resetPasswordService = async (token: string, newPassword: string) =
     if (!/[0-9]/.test(newPassword)) throw new ValidationError('Senha sem número');
 
     if (!tokenRecord || tokenRecord.expiresAt < new Date()) throw new NotFoundError('Token inválido ou expirado');
-    console.log(tokenRecord.expiresAt)
     const hashedPassword = await bcrypt.hash(newPassword, 10);
 
     await prisma.user.update({

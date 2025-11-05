@@ -8,6 +8,7 @@ import {
     logoutService,
     refreshTokenService,
     registerService,
+    sendEmailConfirmationServiceSender,
     validateEmailAvailabilityService
 } from "./auth.service";
 
@@ -41,7 +42,7 @@ export const validateEmailAvailability = async (req: Request, res: Response): Pr
             res.status(400).json({ message: 'O campo "email" é obrigatório' });
             return;
         }
-        
+
         await validateEmailAvailabilityService(email);
 
         res.status(200).json({ message: 'Email disponível' });
@@ -62,7 +63,30 @@ export const confirmEmail = async (req: Request, res: Response): Promise<void> =
 
         await confirmEmailService(String(token));
 
-        res.status(201).json({ message: 'Email disponível' });
+        res.status(201).json({ message: 'Email confirmado' });
+        return
+
+    } catch (error: any) {
+
+        handleControllerError(res, error);
+
+    }
+}
+
+export const resendConfirmationEmail = async (req: Request, res: Response): Promise<void> => {
+
+    try {
+
+        const { email } = req.body;
+
+        if (!email) {
+            res.status(400).json({ message: 'O campo "email" é obrigatório' });
+            return;
+        }
+
+        await sendEmailConfirmationServiceSender(email);
+
+        res.status(200).json({ message: 'Email de confirmação enviado com sucesso' });
         return
 
     } catch (error: any) {
@@ -175,6 +199,11 @@ export const deleteUser = async (req: Request, res: Response): Promise<void> => 
     const userId = Number(req.user?.userId);
 
     try {
+
+        if (!userId || isNaN(userId) || userId == undefined) {
+            res.status(401).json({ message: 'Usuário não autenticado' });
+            return
+        }
 
         await deleteUserService(userId);
 

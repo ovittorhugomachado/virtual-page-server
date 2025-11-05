@@ -3,7 +3,7 @@ import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken'
 import type { UserData } from "../../types/user-data";
 import { stripNonDigits } from "../../utils/stripFormating";
-import { emailConfirmationService } from '../../utils/email-sender';
+import { emailConfirmationServiceSender } from '../../utils/email-sender';
 import { confirmEmailTokenGenerator, generateTokensPassword } from './utils/token-generator';
 import { ConflictError, NotFoundError, UnauthorizedError, ValidationError } from "../../utils/errors";
 
@@ -40,9 +40,26 @@ export const registerService = async (data: UserData) => {
         },
     });
 
-    await emailConfirmationService(user.email, user.tokenEmail, user.name);
+    await emailConfirmationServiceSender(user.email, user.tokenEmail, user.name);
 
     return user;
+}
+
+export const sendEmailConfirmationServiceSender = async (email: string) => {
+
+    const existingUser = await prisma.user.findUnique({ where: { email } })
+    if (!existingUser) throw new NotFoundError('Email não cadastrado');
+
+    const { activeEmailToken } = confirmEmailTokenGenerator({ email });
+
+    const user = await prisma.user.update({
+        where: { email },
+        data: { tokenEmail: activeEmailToken },
+    })
+
+    await emailConfirmationServiceSender(user.email, user.tokenEmail, user.name);
+
+    return { message: 'Token de confirmação enviado com sucesso' };
 }
 
 export const validateEmailAvailabilityService = async (email: string) => {

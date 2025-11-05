@@ -13,7 +13,7 @@ const transporter = nodemailer.createTransport({
     },
 });
 
-export const emailConfirmationService = async (email: string, token: string, userName: string) => {
+export const emailConfirmationServiceSender = async (email: string, token: string, userName: string) => {
     const confirmLink = `${process.env.FRONTEND_URL}/confirm-email/${token}`;
 
     await transporter.sendMail({
@@ -48,7 +48,7 @@ export const emailConfirmationService = async (email: string, token: string, use
     });
 };
 
-export const emailChangeConfirmationService = async (email: string, token: string, userName: string) => {
+export const emailChangeConfirmationSender = async (email: string, token: string, userName: string) => {
     const confirmLink = `${process.env.FRONTEND_URL}/confirm-email/${token}`;
 
     await transporter.sendMail({
@@ -83,7 +83,7 @@ export const emailChangeConfirmationService = async (email: string, token: strin
     });
 };
 
-export const emailresetPasswordService = async (email: string, token: string, userName: string | undefined) => {
+export const emailResetPasswordSender = async (email: string, token: string, userName: string | undefined) => {
     const resetLink = `${process.env.FRONTEND_URL}/create-new-password/${token}`
 
     await transporter.sendMail({
