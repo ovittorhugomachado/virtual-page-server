@@ -4,6 +4,6 @@ import { authenticateToken } from '../../middleware/authenticate-token.middlewar
 
 const router = Router();
 
-router.post('/send-message/:userId', authenticateToken, sendNotification);
+router.post('/send-message', authenticateToken, sendNotification);
 
 export default router;
