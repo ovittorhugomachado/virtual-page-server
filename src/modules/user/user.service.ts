@@ -9,6 +9,7 @@ export const getUserDataService = async (userId: number) => {
         select: {
             id: true,
             name: true,
+            phoneNumber: true,
             email: true,
             status: true,
             projects: {
@@ -54,6 +55,40 @@ export const updateEmailService = async (userId: number, email: string) => {
 
     if (!user) {
         throw new NotFoundError('Usuário não encontrado');
+    }
+
+    return user;
+};
+
+export const updateUserDataService = async (
+    userId: number,
+    data: { name?: string; email?: string; phoneNumber?: string }
+) => {
+
+    const updateData: any = {};
+
+    if (data.name !== undefined) updateData.name = data.name;
+    if (data.phoneNumber !== undefined) updateData.phoneNumber = data.phoneNumber;
+
+    if (data.email) {
+        const { activeEmailToken } = confirmEmailTokenGenerator({ email: data.email });
+        updateData.email = data.email;
+        updateData.status = 'PENDING';
+        updateData.tokenEmail = activeEmailToken;
+    }
+
+    if (Object.keys(updateData).length === 0) {
+        throw new Error('Nenhum dado válido foi fornecido para atualização.');
+    }
+
+    const user = await prisma.user.update({
+        where: { id: userId },
+        data: updateData,
+        select: { name: true, email: true, phoneNumber: true, tokenEmail: true },
+    });
+
+    if (data.email) {
+        await emailChangeConfirmationSender(user.email, user.tokenEmail, user.name);
     }
 
     return user;
