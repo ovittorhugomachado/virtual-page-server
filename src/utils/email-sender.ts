@@ -4,23 +4,27 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 const transporter = nodemailer.createTransport({
-    host: 'smtp.hostinger.com',
-    port: 465,
-    secure: true,
-    auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASS,
-    },
+  host: 'smtp.hostinger.com',
+  port: 465,
+  secure: true,
+  auth: {
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASS,
+  },
 });
 
 export const emailConfirmationServiceSender = async (email: string, token: string, userName: string) => {
-    const confirmLink = `${process.env.FRONTEND_URL}/confirm-email/${token}`;
+  if (!email) {
+    throw new Error('O email do destinatário não foi definido.');
+  }
 
-    await transporter.sendMail({
-        from: `"Virtual Page" <${process.env.EMAIL_USER}>`,
-        to: email,
-        subject: 'Confirme seu e-mail',
-        html: `
+  const confirmLink = `${process.env.FRONTEND_URL}/confirmar-email/${token}`;
+
+  await transporter.sendMail({
+    from: `"Virtual Page" <${process.env.EMAIL_USER}>`,
+    to: email,
+    subject: 'Confirme seu e-mail',
+    html: `
       <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #222; max-width: 600px; margin: 0 auto; padding: 20px;">
         <h2 style="color: #000000 !important;">Bem-vindo à Virtual Page, ${userName}!</h2>
         
@@ -45,17 +49,21 @@ export const emailConfirmationServiceSender = async (email: string, token: strin
         <p style="margin-top: 40px;">Atenciosamente,<br><strong>Equipe Virtual Page</strong></p>
       </div>
     `
-    });
+  });
 };
 
 export const emailChangeConfirmationSender = async (email: string, token: string, userName: string) => {
-    const confirmLink = `${process.env.FRONTEND_URL}/confirm-email/${token}`;
+  if (!email) {
+    throw new Error('O email do destinatário não foi definido.');
+  }
 
-    await transporter.sendMail({
-        from: `"Virtual Page" <${process.env.EMAIL_USER}>`,
-        to: email,
-        subject: 'Confirme seu novo e-mail',
-        html: `
+  const confirmLink = `${process.env.FRONTEND_URL}/confirmar-email/${token}`;
+
+  await transporter.sendMail({
+    from: `"Virtual Page" <${process.env.EMAIL_USER}>`,
+    to: email,
+    subject: 'Confirme seu novo e-mail',
+    html: `
       <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #222; max-width: 600px; margin: 0 auto; padding: 20px;">
         <h2 style="color: #000000 !important;">Confirme seu novo e-mail, ${userName}!</h2>
 
@@ -80,17 +88,17 @@ export const emailChangeConfirmationSender = async (email: string, token: string
         <p style="margin-top: 40px;">Atenciosamente,<br><strong>Equipe Virtual Page</strong></p>
       </div>
     `
-    });
+  });
 };
 
 export const emailResetPasswordSender = async (email: string, token: string, userName: string | undefined) => {
-    const resetLink = `${process.env.FRONTEND_URL}/create-new-password/${token}`
+  const resetLink = `${process.env.FRONTEND_URL}/create-new-password/${token}`
 
-    await transporter.sendMail({
-        from: `"Virtual Page" <${process.env.EMAIL_USER}>`,
-        to: email,
-        subject: 'Recuperação de senha',
-        html: `
+  await transporter.sendMail({
+    from: `"Virtual Page" <${process.env.EMAIL_USER}>`,
+    to: email,
+    subject: 'Recuperação de senha',
+    html: `
       <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #222; max-width: 600px; margin: 0 auto; padding: 20px;">
         <h2 style="color: #000000 !important;">Olá ${userName}!</h2>
         
@@ -116,5 +124,5 @@ export const emailResetPasswordSender = async (email: string, token: string, use
         <p style="margin-top: 40px;">Atenciosamente,<br><strong>Equipe Virtual Page</strong></p>
       </div>
     `
-    });
+  });
 };
